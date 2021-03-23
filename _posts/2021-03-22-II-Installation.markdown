@@ -42,6 +42,7 @@ Second, allow public access. The most straightforward way to allow public access
 
 Next, you’ll now need to create a programmatic IAM user with r/w access to the new bucket. First create the user with programmatic access, and grant the permissions to your previously created
 bucket.
+
 ![AWS 3](/assets/images/aws3.PNG)
 
 ![AWS 4](/assets/images/aws4.PNG)

@@ -1,2 +1,6 @@
 @import "minima/skins/{{ site.minima.skin | default: 'dark' }}";
 @import 'minima/initialize';
+
+.site-title {
+  color: #9147ff;
+}
