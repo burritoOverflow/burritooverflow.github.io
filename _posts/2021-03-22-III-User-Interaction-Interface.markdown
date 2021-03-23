@@ -16,7 +16,7 @@ success, and redirected to the root path (now with a JWT stored as an HTTP cooki
 
 A failed request.
 
-![login fail](/assets/images/loginFail.PNG)
+![login fail](/assets/images/loginFail.png)
 
 The login process is handled by `login.js`. The simplified code snippet for handling the login process is as follows:
 
