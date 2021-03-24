@@ -149,7 +149,7 @@ The following video shows the process of user sign-up, the creation and subseque
 
 <iframe width="740" height="425" src="https://www.youtube.com/embed/DvG5XR9BK18" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-For a look into the database, here's `Alice`'s entry:
+For a look into the database, here's `alice2221`'s entry:
 
 ```json
 {
@@ -170,9 +170,9 @@ For a look into the database, here's `Alice`'s entry:
 }
 ```
 
-Note a few things here: `Alice`'s password is stored hashed + salt, and she has one active JWT. The `socketIOIDs` array is empty, as this screenshot was taken just after exiting the room. We have the `name` and `email` as entered.
+Note a few things here: `alice2221`'s password is stored hashed + salt, and she has one active JWT. The `socketIOIDs` array is empty, as this screenshot was taken just after exiting the room. We have the `name` and `email` as entered.
 
-Here is `Alice`'s newly created room: `aliceroom`. This was also copied after leaving the room. so we see no `users` present. The admin of the room is `Alice`'s `_id`, as she is the user that created it.
+Here is `alice2221`'s newly created room: `aliceroom`. This was also copied after leaving the room. so we see no `users` present. The admin of the room is `alice2221`'s `_id`, as she is the user that created it.
 
 ```json
 {
@@ -186,7 +186,7 @@ Here is `Alice`'s newly created room: `aliceroom`. This was also copied after le
 }
 ```
 
-Last, here is the message `Alice` sent during her brief foray into her room:
+Last, here is the message `alice2221` sent during her brief foray into her room:
 
 ```json
 {
@@ -201,4 +201,4 @@ Last, here is the message `Alice` sent during her brief foray into her room:
 }
 ```
 
-We see that the `room` is the same `_id` as `aliceroom` and the `sender` is the same `_id` as `Alice`.
+We see that the `room` is the same `_id` as `aliceroom` and the `sender` is the same `_id` as `alice2221`.
