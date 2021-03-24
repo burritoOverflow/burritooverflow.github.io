@@ -141,6 +141,64 @@ if (req.cookies.token) {
 }
 ```
 
+---
+
+### Demo - User Creation, Room Creation and Join
+
 The following video shows the process of user sign-up, the creation and subsequent joining of a new room along with a UI easter egg on the `join` page.
 
 <iframe width="740" height="425" src="https://www.youtube.com/embed/DvG5XR9BK18" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+For a look into the database, here's `Alice`'s entry:
+
+```json
+{
+  "_id": { "$oid": "605a9dd8e876d054ac9b416d" },
+  "name": "alice2221",
+  "email": "alice221@yahoo.org",
+  "password": "$2a$10$DHWXKAY1e5wI5Lr1J0ZIjeUFUUSusMqH/AXLokMS.eVLhuPGvO0Lu",
+  "tokens": [
+    {
+      "_id": { "$oid": "605a9dd9e876d054ac9b416e" },
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDVhOWRkOGU4NzZkMDU0YWM5YjQxNmQiLCJpYXQiOjE2MTY1NTEzODV9.009WTYExU-tumRNArzNeYOjar9CnioxI40Zt_iU2XiY"
+    }
+  ],
+  "socketIOIDs": [],
+  "createdAt": { "$date": "2021-03-24T02:03:04.892Z" },
+  "updatedAt": { "$date": "2021-03-24T02:03:35.702Z" },
+  "__v": 3
+}
+```
+
+Note a few things here: `Alice`'s password is stored hashed + salt, and she has one active JWT. The `socketIOIDs` array is empty, as this screenshot was taken just after exiting the room. We have the `name` and `email` as entered.
+
+Here is `Alice`'s newly created room: `aliceroom`. This was also copied after leaving the room. so we see no `users` present. The admin of the room is `Alice`'s `_id`, as she is the user that created it.
+
+```json
+{
+  "_id": { "$oid": "605a9de4e876d054ac9b416f" },
+  "name": "aliceroom",
+  "admin": { "$oid": "605a9dd8e876d054ac9b416d" },
+  "users": [],
+  "createdAt": { "$date": "2021-03-24T02:03:16.490Z" },
+  "updatedAt": { "$date": "2021-03-24T02:03:35.592Z" },
+  "__v": 2
+}
+```
+
+Last, here is the message `Alice` sent during her brief foray into her room:
+
+```json
+{
+  "_id": { "$oid": "605a9defe876d054ac9b4172" },
+  "contents": "Wow my own room.",
+  "sender": { "$oid": "605a9dd8e876d054ac9b416d" },
+  "date": { "$date": "2021-03-24T02:03:27.744Z" },
+  "room": { "$oid": "605a9de4e876d054ac9b416f" },
+  "createdAt": { "$date": "2021-03-24T02:03:27.918Z" },
+  "updatedAt": { "$date": "2021-03-24T02:03:27.918Z" },
+  "__v": 0
+}
+```
+
+We see that the `room` is the same `_id` as `aliceroom` and the `sender` is the same `_id` as `Alice`.
