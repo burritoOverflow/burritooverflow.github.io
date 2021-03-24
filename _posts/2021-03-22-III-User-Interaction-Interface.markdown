@@ -84,7 +84,7 @@ localstorage).
 
 ![room join](/assets/images/roomJoin.PNG)
 
-If the user opts to create a new room, a seperate input field is displayed, and the room list is hidden. Rooms must be globally unique (case insensitive; all rooms are lowercase). Upon entering a room name, a request is made, if the room name is unique, it is created with the current user as the room's admin. Another request is made to the database to fetch the latest rooms; both the input and the room list are updated to reflect the change.
+If the user opts to create a new room, a separate input field is displayed, and the room list is hidden. Rooms must be globally unique (case insensitive; all rooms are lowercase). Upon entering a room name, a request is made, if the room name is unique, it is created with the current user as the room's admin. Another request is made to the database to fetch the latest rooms; both the input and the room list are updated to reflect the change.
 
 ![room join 2](/assets/images/roomJoin2.PNG)
 
@@ -105,7 +105,8 @@ async function addNewRoom(roomName) {
 }
 ```
 
-A simplified snippet of the server-side code to handle the room creation request in the route handler in `/routes/room.js`:
+A simplified snippet of the server-side code to handle the room creation request in
+the route handler in `/routes/room.js`:
 
 ```js
 if (req.cookies.token) {
