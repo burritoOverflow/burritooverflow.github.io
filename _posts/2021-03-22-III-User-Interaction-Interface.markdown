@@ -140,3 +140,7 @@ if (req.cookies.token) {
   res.status(401).send({ error: 'Unauthorized' });
 }
 ```
+
+The following video shows the process of user sign-up, the creation and subsequent joining of a new room along with a UI easter egg on the `join` page.
+
+<iframe width="740" height="425" src="https://www.youtube.com/embed/DvG5XR9BK18" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
