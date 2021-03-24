@@ -140,9 +140,3 @@ if (req.cookies.token) {
   res.status(401).send({ error: 'Unauthorized' });
 }
 ```
-
-<video controls width="750">
-    <source src="/assets/videos/screencap.mp4"
-            type="video/mp4">
-    Sorry, your browser doesn't support embedded videos.
-</video>
