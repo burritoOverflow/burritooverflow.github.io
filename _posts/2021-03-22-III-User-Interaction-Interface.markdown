@@ -12,6 +12,48 @@ application’s name, and a link to sign up (for new users). Login requires an e
 ’ This is depicted in the second screenshot. Form submission is not performed; the login process is accomplished via AJAX. If the request succeeds, the user is briefly shown a toast indicating
 success, and redirected to the root path (now with a JWT stored as an HTTP cookie), allowing them to access the application.
 
+For the `user` model schema:
+
+Usernames are converted to lowercase and must be unique; this is performed via the model schema, see `/models/user.js`. Code snippet for the `user` model.
+
+```js
+const UserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      unique: true,
+      lowercase: true,
+      required: true,
+      trim: true,
+      minLen
+...
+```
+
+Password strength is enforced, and the following must be met for the password to be valid,
+also in `/models/user.js`. If the password is weak, this is reported back to the user when attempting to sign up.
+
+```js
+password: {
+    type: String,
+    required: true,
+    trim: true,
+    validate(value) {
+    if (
+        !validator.isStrongPassword(value, {
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+        returnScore: false,
+        })
+    ) {
+        throw new Error('Weak password');
+    }
+    },
+}
+```
+
 ![login page](/assets/images/login.PNG)
 
 A failed request.
