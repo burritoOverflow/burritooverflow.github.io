@@ -55,8 +55,7 @@ the environment variable file.
 ---
 
 For installation of the application server, clone the repository, install the dependencies,
-and start the server. The application has been tested and developed using Node.js versions 12.20.1
-and 15.3.0; modern JavaScript features are used throughout, so a minimum version of 12 is suggested.
+and start the server. The application has been tested and developed using Node.js versions 15.3.0; modern JavaScript features are used throughout, so a minimum version of 15 is suggested.
 
 ![NPM 1](/assets/images/npm1.PNG)
 
