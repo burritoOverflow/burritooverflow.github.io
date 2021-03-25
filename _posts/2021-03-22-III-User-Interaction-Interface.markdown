@@ -25,8 +25,8 @@ const UserSchema = new mongoose.Schema(
       lowercase: true,
       required: true,
       trim: true,
-      minLen
-...
+      minLength: 3,
+    }
 ```
 
 Password strength is enforced, and the following must be met for the password to be valid,
