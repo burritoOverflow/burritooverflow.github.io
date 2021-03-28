@@ -244,3 +244,87 @@ Last, here is the message `alice2221` sent during her brief foray into her room:
 ```
 
 We see that the `room` is the same `_id` as `aliceroom` and the `sender` is the same `_id` as `alice2221`.
+
+### Rooms and Messaging
+
+Users send messages to the room via the textarea element. Messages can be sent by either clicking the `send message` button or pressing the enter key. After sending, the message is received by the server,
+stored in the database, and sent back to the room (with a few exceptions). The UI updates for messages are 'honest', in that instead of just adding the sent message to the UI in an optimistic fashion,
+a user doesn't see the messaged added to the `rooms`'s messages until the other participants do; once a message is visible, it's already been received and stored by the server.
+
+An overview of the messaging process, from the client, in `chat.js`:
+
+```js
+function sendMessage(message) {
+  const msgObj = { message, msgSendDate: +new Date() };
+  socket.emit('clientChat', msgObj, (serverMsg) => {
+    showUserToast(serverMsg);
+  });
+}
+```
+
+It's quite simple. The client emits a `clientChat` event when this function is invoked. The callback provided
+runs if there's an error (communicated back via the server) showing the user a toast with the error message. The `sendMessage` function is called in two places
+for the `send message` button click, or when the enter key is pressed and the textarea is focused.
+
+```js
+msgBtn.addEventListener('click', () => {
+  // make sure a message is present
+  const msgStr = msgInput.value.trim();
+  if (msgStr === '') {
+    return;
+  }
+
+  if (determineIfDelayedMessage(msgStr)) {
+    sendDelayedMessage(msgStr);
+  } else {
+    sendMessage(msgStr);
+  }
+
+  // clear the input after send
+  msgInput.value = '';
+  // --snip--
+```
+
+and
+
+```js
+msgInput.addEventListener('keypress', (e) => {
+  const { key } = e;
+  if (key === 'Enter') {
+    const msgStr = msgInput.value.trim();
+    if (msgStr !== '') {
+      if (determineIfDelayedMessage(msgStr)) {
+        sendDelayedMessage(msgStr);
+      } else {
+        sendMessage(msgStr);
+      }
+
+      // clear the message that was sent
+      msgInput.value = '';
+  // --snip--
+
+```
+
+A greatly simplified snippet of the server-side handling of this event in `index.js` (leaving out various checks for special messages):
+
+```js
+socket.on('clientChat', async (msgObj, callback) => {
+  appendToLog(`${JSON.stringify(msgObj)}\n`);
+  const { message } = msgObj;
+
+  // --snip--
+
+  addMessage(socket, msgObj, socketUser.room);
+  // emit the message
+  io.to(socketUser.room).emit('chatMessage', msgObj);
+});
+```
+
+We see that after logging and storing the message, the server emits a `chatMessage` event to the `room`. When
+clients receive this event, the contents of the message are added to the UI:
+
+`chat.js`
+
+```js
+socket.on('chatMessage', (message) => chatMessageReceived(message));
+```

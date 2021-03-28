@@ -65,5 +65,5 @@ With the dependencies installed, either run the server, or start the dev server 
 
 ![NPM 3](/assets/images/npm3.PNG)
 
-This same deployment process should be followed if deploying the application on a Linux/Windows instance—change the PORT environment variable to 443 (the application can be run without HTTPS,
+This same deployment process should be followed if deploying the application on a Linux/Windows instance--change the PORT environment variable to 443 (the application can be run without HTTPS,
 but setting samesite secure HTTP-only cookies requires HTTPS). Also, it’s 2021 and getting an SSL certificate is simpler than ever.
