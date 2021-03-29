@@ -320,7 +320,33 @@ socket.on('clientChat', async (msgObj, callback) => {
 });
 ```
 
-We see that after logging and storing the message, the server emits a `chatMessage` event to the `room`. When
+The function that stores messages in MongoDB:
+
+```js
+async function addMessage(socket, msgObj, roomName) {
+  const { message } = msgObj;
+  const _user = await User.findOne({
+    'socketIOIDs.sid': socket.id,
+  });
+
+  const room = await Room.findOne({ name: roomName });
+
+  const _message = new Message({
+    contents: message,
+    sender: _user._id,
+    date: new Date(msgObj.msgSendDate),
+    room: room._id,
+  });
+
+  const savedMessage = await _message.save();
+}
+```
+
+The user's `_id` is located via the socketIO id provided in the first argument. The message contents are destructured
+from the second argument, and the `room` `_id` is located via a query for the `roomName` provided via the third argument.
+This message is then saved. Note this format matches the JSON format we showed earlier of `alice2221` demo message.
+
+After logging and storing the message, the server emits a `chatMessage` event to the `room`. When
 clients receive this event, the contents of the message are added to the UI:
 
 `chat.js`
