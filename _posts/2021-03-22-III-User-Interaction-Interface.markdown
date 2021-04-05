@@ -456,3 +456,8 @@ socket.on('private message', (pm) => {
   }
 });
 ```
+
+The private message element provides a simple UI that lists the users and the message threads between them.
+In each thread, sent messages are displayed in black, and received messages are displayed in grey.
+
+![room join](/assets/images/pm1.PNG)
