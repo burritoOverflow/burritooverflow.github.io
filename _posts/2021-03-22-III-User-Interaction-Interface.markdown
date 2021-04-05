@@ -247,9 +247,11 @@ We see that the `room` is the same `_id` as `aliceroom` and the `sender` is the 
 
 ### Rooms and Messaging
 
-Users send messages to the room via the textarea element. Messages can be sent by either clicking the `send message` button or pressing the enter key. After sending, the message is received by the server,
-stored in the database, and sent back to the room (with a few exceptions). The UI updates for messages are 'honest', in that instead of just adding the sent message to the UI in an optimistic fashion,
-a user doesn't see the messaged added to the `rooms`'s messages until the other participants do; once a message is visible, it's already been received and stored by the server.
+Users send messages to the room via the textarea element. Messages can be sent by either clicking the `send message` button or pressing the enter key.
+After sending, the message is received by the server, stored in the database, and sent back to the room (with a few exceptions).
+The UI updates for messages are 'honest', in that instead of just adding the sent message to the UI in an optimistic fashion,
+a user doesn't see the messaged added to the `rooms`'s messages until the other participants do; once a message is visible, it's already been
+received and stored by the server.
 
 An overview of the messaging process, from the client, in `chat.js`:
 
@@ -344,6 +346,7 @@ async function addMessage(socket, msgObj, roomName) {
 
 The user's `_id` is located via the socketIO id provided in the first argument. The message contents are destructured
 from the second argument, and the `room` `_id` is located via a query for the `roomName` provided via the third argument.
+Additionally, the current date is added to the message--this date reflects the time that the message was sent from the client.
 This message is then saved. Note this format matches the JSON format we showed earlier of `alice2221` demo message.
 
 After logging and storing the message, the server emits a `chatMessage` event to the `room`. When
@@ -353,4 +356,103 @@ clients receive this event, the contents of the message are added to the UI:
 
 ```js
 socket.on('chatMessage', (message) => chatMessageReceived(message));
+```
+
+### Private Messaging
+
+Users can send private messages to other users in the same room. Private messages differ from the messages previously demonstrated in several
+ways:
+
+1. Private messages are only visible between the sender and recipient.
+
+2. Private messages are not stored persistently. The server simply sends the private messages to the recipient.
+
+3. Private messages are totally ephemeral; they reside only on the script on the involved clients (so only for the duration of the browser tab's lifecycle)
+
+The following video demonstrates the private messaging functionality and compares it to the room-wide messaging functionality.
+
+<iframe width="740" height="425" src="https://www.youtube.com/embed/Wq000OT_cLw" title="YouTube video player" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+The private message element can be toggled by pressing the `'p'` key (outside of an input element), or clicking the toggle button.
+On the client, the sending functionality is handled by the `sendPM` function.
+
+```js
+function sendPM() {
+  const content = document.getElementById('pm-textarea').value;
+  if (content.trim() === '') {
+    return;
+  }
+
+  if (pmReciever === undefined) {
+    return;
+  }
+
+  socket.emit('private message', {
+    content,
+    to: pmReciever.id,
+    toName: pmReciever.username,
+  });
+
+  const toNameLower = pmReciever.username.toLowerCase();
+  const msgDate = new Date().toLocaleString();
+
+  const pm = new PrivateMessage(toNameLower, msgDate, content);
+  pmMap.addPM(toNameLower, pm);
+
+  const pmList = document.getElementById('pm-list');
+  const pmLi = document.createElement('li');
+  pmLi.classList.add('sent-pm-li');
+  pmLi.innerText = `${msgDate} ${content}`;
+  pmList.appendChild(pmLi);
+
+  document.getElementById('pm-textarea').value = '';
+}
+```
+
+On the server, the `'private message'` event is handled succintly:
+
+```js
+socket.on('private message', ({ content, to }) => {
+  // note that this is only sent to the 'to'
+  socket.to(to).emit('private message', {
+    content,
+    from: socket.id,
+    fromName: socket.username,
+  });
+});
+```
+
+When the client receives the `'private message'` event, the message is stored locally, the UI updated, and the user
+notified.
+
+```js
+socket.on('private message', (pm) => {
+  const fromNameLower = pm.fromName.toLowerCase();
+  const pmsg = {
+    content: pm.content,
+    date: new Date().toLocaleString(),
+  };
+
+  const privMsg = new PrivateMessage('You', pmsg.date, pmsg.content);
+  pmMap.addPM(fromNameLower, privMsg);
+
+  const message = `PM from ${pm.fromName}`;
+  updatePmLiElement(fromNameLower);
+
+  if (document.hidden) {
+    displayNotification(message);
+  } else {
+    showUserToast(message);
+  }
+
+  // if the currently selected PM user is the user that sent the
+  // PM, update the PM list when recieved
+  if (pmReciever.username === fromNameLower) {
+    const pmList = document.getElementById('pm-list');
+    const pmLi = document.createElement('li');
+    pmLi.innerText = `${pmsg.date} ${pmsg.content}`;
+    pmList.appendChild(pmLi);
+  }
+});
 ```
