@@ -185,7 +185,7 @@ if (req.cookies.token) {
 
 ---
 
-### Demo - User Creation, Room Creation and Join
+### Demo - User Creation, Room Creation and Joining a Room
 
 The following video shows the process of user sign-up, the creation and subsequent joining of a new room along with a UI easter egg on the `join` page.
 
@@ -367,7 +367,7 @@ ways:
 
 2. Private messages are not stored persistently. The server simply sends the private messages to the recipient.
 
-3. Private messages are totally ephemeral; they reside only on the script on the involved clients (so only for the duration of the browser tab's lifecycle)
+3. Private messages are totally ephemeral; they reside only on the script and on the involved clients in localstorage.
 
 The following video demonstrates the private messaging functionality and compares it to the room-wide messaging functionality.
 
@@ -436,6 +436,9 @@ socket.on('private message', (pm) => {
 
   const privMsg = new PrivateMessage('You', pmsg.date, pmsg.content);
   pmMap.addPM(fromNameLower, privMsg);
+  const { room } = parseQSParams();
+  const lsPMStr = `pms${room}`;
+  pmMap.setLocalStorage(lsPMStr);
 
   const message = `PM from ${pm.fromName}`;
   updatePmLiElement(fromNameLower);
@@ -455,6 +458,53 @@ socket.on('private message', (pm) => {
     pmList.appendChild(pmLi);
   }
 });
+```
+
+Two classes exist for the purpose of handling Private Messages, `PrivateMessage` and `PrivateMessageMap`. The former
+is used for each individual message; the latter is used for storing all of the user's private messages from this room.
+
+Each Private Message object stores the recipient `to` the `date` and the message `contents`.
+
+```js
+class PrivateMessage {
+  constructor(to, date, contents) {
+    this._to = to;
+    this._date = date;
+    this._contents = contents;
+  }
+
+  // snip
+
+  toJSON() {
+    const { to, date, contents } = this;
+    return { to, date, contents };
+  }
+}
+```
+
+`PrivateMessageMap` is a simple `Map` that stores the username of the other user involved in the Private Message thread
+as key and an array of the `PrivateMessage` objects as value--the storage is demonstrated in the event hander snippet above.
+On initial load, if localstorage contains pm contents for the current `room`, the contents are parsed and stored in the
+current `PrivateMessageMap`. Each subsequent message sent or received is added to the map, and the contents are then serialized
+and added in localstorage.
+
+```js
+  setLocalStorage(lsKeyname) {
+    const jsonMap = Object.fromEntries(this._pmMap);
+    const mapStr = JSON.stringify(jsonMap);
+    localStorage.setItem(lsKeyname, mapStr);
+  }
+
+  parseFromlocalStorage(lsKeyname) {
+    const lsPMs = localStorage.getItem(lsKeyname);
+    if (!lsPMs) {
+      return false;
+    }
+
+    const jsonPMs = JSON.parse(lsPMs);
+    this._pmMap = new Map(Object.entries(jsonPMs));
+    return true;
+  }
 ```
 
 The private message element provides a simple UI that lists the users and the message threads between them.
