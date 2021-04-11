@@ -245,6 +245,8 @@ Last, here is the message `alice2221` sent during her brief foray into her room:
 
 We see that the `room` is the same `_id` as `aliceroom` and the `sender` is the same `_id` as `alice2221`.
 
+---
+
 ### Rooms and Messaging
 
 Users send messages to the room via the textarea element. Messages can be sent by either clicking the `send message` button or pressing the enter key.
@@ -357,6 +359,103 @@ clients receive this event, the contents of the message are added to the UI:
 ```js
 socket.on('chatMessage', (message) => chatMessageReceived(message));
 ```
+
+---
+
+### File Sharing
+
+Within the main chat, users can share files with the group. A file input element exists near the chat, allowing users to select a file to share.
+File size limits are limited to 5MB. The file selected by the user is POSTed to the application server,
+where it's uploaded to S3. Upon completion, the URL where the file is
+accessible is shared to the chat, allowing any of the
+chat's users to download the file.
+
+```js
+const fileInput = document.getElementById('file-upload-input');
+const onSelectFile = () => uploadFile(fileInput.files[0]);
+fileInput.addEventListener('change', onSelectFile, false);
+```
+
+The upload file function:
+
+```js
+function uploadFile(file) {
+  const data = new FormData();
+  data.append('upload', file);
+
+  // post data
+  fetch('/api/messages/file', {
+    method: 'POST',
+    body: data,
+  })
+    .then((response) => response.json())
+    .then(
+      (resJSON) => {
+        if (resJSON.error) {
+          showUserToast(resJSON.error);
+        } else {
+          const userMessage = `shared ${resJSON.originalName} : ${resJSON.url}`;
+          sendMessage(userMessage);
+        }
+        fileInput.value = '';
+    )
+    .catch(
+      (error) => console.log(error)
+}
+```
+
+The route for handing file uploads (truncated):
+
+```js
+router.post(
+  '/messages/file',
+  upload.single('upload'),
+  async (req, res) => {
+    const uploadDateStr = String(+new Date());
+
+    const fileBuffer = req.file.buffer;
+    const fileExtension = req.file.originalname.slice(
+      req.file.originalname.indexOf('.')
+    );
+    let filename = req.file.originalname.slice(
+      0,
+      req.file.originalname.indexOf('.')
+    );
+
+    // replace spaces with underscores
+    filename = filename.split(' ').join('_');
+    const uploadFilename = `${filename}_${uploadDateStr}.${fileExtension}`;
+
+    const s3Response = await s3
+      .upload({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: uploadFilename,
+        Body: fileBuffer,
+      })
+      .promise();
+
+    // build the public URL
+    const publicURLPrefix = process.env.PUBLIC_S3_URL;
+    const filePublicURL = `${publicURLPrefix}${uploadFilename}`;
+
+    // on success, return the public url in the response
+    res.status(201).send({
+      originalName: req.file.originalname,
+      url: filePublicURL,
+    });
+  },
+  (error, req, res, next) => {
+    // return error if failed
+    res.status(400).send({ error: error.message });
+  }
+);
+```
+
+The end result is the chat element containing the URL for the uploaded file.
+
+![chat file upload](/assets/images/fileShareThread.PNG)
+
+---
 
 ### Private Messaging
 
