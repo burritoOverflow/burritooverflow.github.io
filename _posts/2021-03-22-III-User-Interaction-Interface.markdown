@@ -313,7 +313,6 @@ A greatly simplified snippet of the server-side handling of this event in `index
 
 ```js
 socket.on('clientChat', async (msgObj, callback) => {
-  appendToLog(`${JSON.stringify(msgObj)}\n`);
   const { message } = msgObj;
 
   // --snip--
@@ -464,7 +463,7 @@ ways:
 
 1. Private messages are only visible between the sender and recipient.
 
-2. Private messages are not stored persistently. The server simply sends the private messages to the recipient.
+2. Private messages are not stored persistently in the database. The server simply sends the private messages to the recipient.
 
 3. Private messages are totally ephemeral; they reside only on the script and on the involved clients in localstorage.
 
