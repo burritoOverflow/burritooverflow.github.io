@@ -7,8 +7,9 @@ categories: project documentation
 
 ### Channels
 
-Seperate from the main chat is a `Channel` feature. `Channel` allow for a microblogging-style social media feed.
-This simplified broadcast tool allows the `Channel` owner the opportunity to use the feature as a one-to-many tool for sharing `Post`s.
+Separate from the main chat is a `Channel` feature. The `Channel` feature allow for a microblogging-style social media feed.
+This simplified broadcast tool allows the `Channel` owner the opportunity to use the feature as a one-to-many tool for sharing `Post`s with
+all users of the service.
 Non-admin users can 'like' or 'dislike' `Post`s shared in the channel. It provides a simple user interface displaying the owner's `Post`s
 and the number of 'like' and 'dislikes'.
 
@@ -213,7 +214,7 @@ router.get('/channel/:channel/updatetime', async (req, res) => {
 
 The `channelsLastUpdate` is a map created on server start via the `setLatestPostTimes` function, and subsequently updated when posts are added to channels.
 `setLatestPostTimes` runs multiple queries for the latest post in each channel, and sets the timestamp as the value for the channel name key. The value is
-returned to the requesting client from the channel route param in the route handler above.
+returned to the requesting client from the channel route param in the `updatetime` route handler above.
 
 ```js
 async function setLatestPostTimes() {

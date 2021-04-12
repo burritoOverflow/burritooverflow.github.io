@@ -609,3 +609,73 @@ The private message element provides a simple UI that lists the users and the me
 In each thread, sent messages are displayed in black, and received messages are displayed in grey.
 
 ![room join](/assets/images/pm1.PNG)
+
+---
+
+### Additional Features and Functionality
+
+#### Keybindings
+
+Several keybindings have been added to increase usability and allow users to easily use additional functionality; these keypresses
+only function when the user is not focused on the textarea input:
+
+`x` - Make the browser fullscreen.
+
+`q` - 'focus' mode. This dramatically changes the UI, hiding elements that are not the message thread nor the textarea input:
+
+![focus mode](/assets/images/focusMode.PNG)
+
+`m` - focus on the textarea element--for quickly entering message input.
+
+`s` - open the file share prompt, instead of clicking on it manually.
+
+`f` - focus on the 'search message' element, allowing for a quick search of message contents in the current elements in the thread.
+
+`t` - scroll to the top of the message thread.
+
+`b` - scroll to the bottom of the message thread.
+
+`j` - scroll up by a single message height.
+
+`k` - scroll down by a single element.
+
+#### Exploding Messages
+
+Users can send a special type of message that does not persist (is not stored), and is removed from the DOM in 45 seconds. These 'exploding' messages require a special syntax:
+
+```
+/explode | /expire <message>
+```
+
+Client-side, this is handled in the `chatMessageReceived` function; if the message object has the expiration flag set
+the client sets a timeout, and styles the element in a distinct fashion:
+
+```js
+if (message.expireDuration) {
+  createdLi.classList.add('expire-msg');
+  createdLi.childNodes.forEach((child) => {
+    if (!child.classList) {
+      return;
+    }
+
+    // ignore the date element
+    if (!child.classList.contains('date-span')) {
+      child.style.backgroundColor = 'white';
+    } else {
+      const secondsExpire = Number(message.expireDuration) / 1000;
+      child.innerText = `Remains for: ${secondsExpire}`;
+
+      // update the remaining time on the message once per second
+      setInterval(() => {
+        let updateTime = Number(child.innerText.split(' ')[2]);
+        --updateTime;
+        child.innerText = `Remains for: ${updateTime}`;
+      }, 1000);
+    }
+  });
+
+  setTimeout(() => {
+    createdLi.remove();
+  }, Number(message.expireDuration));
+}
+```
