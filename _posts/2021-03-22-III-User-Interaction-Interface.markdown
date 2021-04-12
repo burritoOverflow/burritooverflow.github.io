@@ -635,9 +635,9 @@ only function when the user is not focused on the textarea input:
 
 `b` - scroll to the bottom of the message thread.
 
-`j` - scroll up by a single message height.
+`j` - scroll up by the height of a single message.
 
-`k` - scroll down by a single element.
+`k` - scroll down by the height of a single message.
 
 #### Exploding Messages
 
@@ -677,5 +677,43 @@ if (message.expireDuration) {
   setTimeout(() => {
     createdLi.remove();
   }, Number(message.expireDuration));
+}
+```
+
+The exploding message style:
+
+![exploding message](/assets/images/explodeMessage.PNG)
+
+#### Change UI Color
+
+A dropdown is placed near the bottom of the window, allowing users to set their preferred accent color. On select, the user's preference is stored in
+localstorage, and the value is retrieved in the future, maintaining the color choice:
+
+![color change](/assets/images/colorDropDown.PNG)
+
+The event handler for the color change is implemented in the `init` function, on click, the color
+is stored as the user's preferred color:
+
+```js
+for (let i = 1; i < dropdown.childNodes.length; i += 2) {
+  // add a click handler to each
+  dropdown.childNodes[i].addEventListener('click', (e) => {
+    e.preventDefault();
+    const textColorChoice =
+      dropdown.childNodes[i].innerText.toLowerCase() + choiceStr;
+
+    const colorHex = getComputedStyle(
+      document.documentElement
+    ).getPropertyValue(`--${textColorChoice}`);
+
+    document.documentElement.style.setProperty('--primaryColor', colorHex);
+
+    // we also need to set the snackbar color
+    const snackBar = document.getElementById('snackbar');
+    snackBar.style.backgroundColor = colorHex;
+
+    // set the selection in the user's localstorage
+    localStorage.setItem('colorChoice', colorHex);
+  });
 }
 ```
