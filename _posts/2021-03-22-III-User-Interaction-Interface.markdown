@@ -689,7 +689,7 @@ The exploding message style:
 A dropdown is placed near the bottom of the window, allowing users to set their preferred accent color. On select, the user's preference is stored in
 localstorage, and the value is retrieved in the future, maintaining the color choice:
 
-![color change](/assets/images/colorDropDown.PNG)
+![color change](/assets/images/colorDropDown.png)
 
 The event handler for the color change is implemented in the `init` function, on click, the color
 is stored as the user's preferred color:
