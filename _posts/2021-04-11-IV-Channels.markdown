@@ -171,6 +171,92 @@ Quick video showing the process of an Admin user adding a `Post` to the `Channel
 <iframe width="740" height="425" src="https://www.youtube-nocookie.com/embed/rMsxKiCnjrw" title="YouTube video player" 
 frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
+Admins can also delete posts they've created. When an admin views a `Channel` they administer, there is an additional element
+on each post that allows them to delete that individual post. The accompanying code, in `channel.js`:
+
+```js
+const deletePostSpan = document.createElement('span');
+deletePostSpan.classList.add('delete-post');
+deletePostSpan.innerText = 'X';
+postLi.appendChild(deletePostSpan);
+postLi.style.paddingTop = 0;
+
+const { channelName } = this;
+const _this = this;
+
+deletePostSpan.onclick = async function () {
+  const res = await deletePost(post._id, channelName);
+  // if success, we need to delete the post (the parent element containing all post contents)
+  if (res) {
+    // remove the line element between this post and the previous
+    if (postLi.previousSibling) {
+      postLi.previousSibling.remove();
+    } else {
+      // this is the first post element
+      // so we also need its next sibling
+      if (postLi.nextSibling) {
+        postLi.nextSibling.remove();
+      }
+    }
+
+    // finally, remove the post and update the state
+    postLi.remove();
+    _this.deletePost(post._id);
+
+    // we'll do a quick styling on success
+    const channelPosts = document.getElementById('channel-main');
+    channelPosts.classList.add('delete-border');
+
+    // revert the added temp style
+    setTimeout(() => {
+      channelPosts.classList.remove('delete-border');
+    }, 1200);
+  }
+};
+```
+
+On click, a DELETE request is sent--if successful, the element is removed from the DOM and the client-side state.
+
+Server-side, in `channel.js` (truncated):
+
+```js
+router.delete('/channel/:channel/:postid', async (req, res) => {
+  // determine if the user making the request is the admin of the channel
+  const channel = await Channel.findOne({ name: req.params.channel });
+  if (!channel) {
+    return res
+      .status(400)
+      .send({ error: `Channel ${req.params.channel} does not exist` });
+  }
+
+  // provided a valid channel, check that the user is the admin of the channel
+  const { admin } = channel;
+  const user = await User.findOne({ 'tokens.token': req.cookies.token });
+
+  // now see if this user is the channel's admin
+  if (!user._id.equals(admin)) {
+    return res.status(401).send({
+      error: "You don't have permission to delete posts from this channel",
+    });
+  }
+
+  // we have a valid user, now we need to delete the post
+  const post = await Post.findOneAndDelete({ _id: req.params.postid });
+  if (!post) {
+    return res.status(400).send({ error: 'Invalid Post id provided' });
+  }
+
+  // since the post has been deleted update the channel's latest update time
+  channelsLastUpdate.set(req.params.channel, +new Date());
+  return res.status(200).send({ result: 'Post deleted' });
+});
+```
+
+Note that the timestamp for the channel is updated for the channel, so clients will request the updated data on the next polling event.
+An overview of polling and timestamps are covered in the section that follows.
+
+---
+
 Clients poll the server for updates every 30 seconds. Every 30 seconds, the `getAllPostsInChannel` function is invoked to fetch the latest timestamp.
 
 ```js
@@ -212,7 +298,7 @@ router.get('/channel/:channel/updatetime', async (req, res) => {
 });
 ```
 
-The `channelsLastUpdate` is a map created on server start via the `setLatestPostTimes` function, and subsequently updated when posts are added to channels.
+The `channelsLastUpdate` is a `Map` created on server start via the `setLatestPostTimes` function, and subsequently updated when posts are added to channels.
 `setLatestPostTimes` runs multiple queries for the latest post in each channel, and sets the timestamp as the value for the channel name key. The value is
 returned to the requesting client from the channel route param in the `updatetime` route handler above.
 

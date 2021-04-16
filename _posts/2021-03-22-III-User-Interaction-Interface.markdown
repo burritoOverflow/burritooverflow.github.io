@@ -691,8 +691,8 @@ localstorage, and the value is retrieved in the future, maintaining the color ch
 
 ![color change](/assets/images/colorDropDown.png)
 
-The event handler for the color change is implemented in the `init` function, on click, the color
-is stored as the user's preferred color:
+The event handler for the color change is implemented in the `init` function; on click, the color
+is stored as the user's preferred color, and the UI accent colors are changed to reflect this choice:
 
 ```js
 for (let i = 1; i < dropdown.childNodes.length; i += 2) {
