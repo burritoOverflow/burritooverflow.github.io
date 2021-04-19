@@ -723,10 +723,10 @@ for (let i = 1; i < dropdown.childNodes.length; i += 2) {
 ### Published Events
 
 The following events are published to Redis, allowing subscribed users (clients viewing the index page) to view real-time updates of events
-occuring in `Rooms` and `Channels`. Room join events, room leave events, and a generic message when a new message is added in a room are published.
+occurring in `Rooms` and `Channels`. Room join events, room leave events, and a generic message when a new message is added in a room are published.
 
 in `index.js` a Redis client is create on server start. The `setUpdate` method is invoked on the `RedisUtils` instance during the
-aformentioned events.
+aforementioned events.
 
 ```js
 const redisPublishClient = new RedisUtils(
