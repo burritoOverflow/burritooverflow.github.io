@@ -22,7 +22,13 @@ AWS_ACCESS_KEY_ID="your-access-key"
 AWS_SECRET_ACCESS_KEY="your-secret-access-key"
 PUBLIC_S3_URL=”your-s3-buckets-public-url”
 PORT=”choose-a-port”
+REDIS_PORT='redis-port'
+REDIS_PASSWORD='redis-password'
+REDIS_HOSTNAME='redis-hostname'
 ```
+
+Redis is used in a pub-sub fashion for live updates to the UI on the index page.
+[Redis Labs](https://redislabs.com/) is used for the Redis instance; the setup is covered in detail on the website.
 
 This file contains valuable credentials, and must not be committed to a source code repository. It’s wise to add the ‘.env’ file to your ‘.gitignore’ immediately after initialization to avoid any mistakes. Configuration for the Atlas instance is quite straightforward and is best suited to reading their documentation, available here. For aid during development and debugging, MongoDB offers a desktop client that allows for exploration, editing, and deletion of documents—this is quite handy and simple to use. Additionally, the MongoDB VSCode extension greatly simplifies quick viewing of documents. If the port environment variable is not set, the server will run on port 3000.
 
