@@ -18,6 +18,10 @@ and the number of 'like' and 'dislikes'.
 Admin users, unlike passive observers, are provided a textarea input for adding `Post` content. When an admin user adds a `Post`, the `Post`'s contents are POSTed to
 the application server, and the `Post` contents are stored in the database. All `Post`s are stored permanently in the same database as messages.
 
+Displayed above the input for adding new content is a character counter that changes state to reflect the current number of non-white-space
+characters currently in the input textarea. Here, input sizes have been limited to 200 characters or less—the counter changes to red when the limit is met or exceeded.
+Post that meet or exceed this limit are not sent.
+
 The `Post` schema is as follows:
 
 ```js
