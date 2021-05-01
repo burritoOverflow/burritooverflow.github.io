@@ -635,9 +635,9 @@ only function when the user is not focused on the textarea input:
 
 `b` - scroll to the bottom of the message thread.
 
-`j` - scroll up by the height of a single message.
+`k` - scroll up by ~the height of a single message.
 
-`k` - scroll down by the height of a single message.
+`j` - scroll down by ~the height of a single message.
 
 #### Exploding Messages
 
